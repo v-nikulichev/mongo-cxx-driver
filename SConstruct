@@ -1943,4 +1943,19 @@ if has_option("gcov"):
 env.Alias('all', ['driver', 'build-unit', 'build-integration', 'build-examples'])
 env.Alias('test', ['unit', 'integration', 'examples'])
 
+env.Clean('shit', ['build',
+                   'site_scons/buildscripts/__init__.pyc',
+                   'site_scons/buildscripts/clang_format.pyc',
+                   'site_scons/buildscripts/cpplint.pyc',
+                   'site_scons/buildscripts/docs.pyc',
+                   'site_scons/buildscripts/git.pyc',
+                   'site_scons/buildscripts/lint.pyc',
+                   'site_scons/buildscripts/resmokelib/__init__.pyc',
+                   'site_scons/buildscripts/resmokelib/utils/__init__.pyc',
+                   'site_scons/buildscripts/resmokelib/utils/globstar.pyc',
+                   'site_scons/buildscripts/utils.pyc',
+                   'site_scons/site_tools/integration_test.pyc',
+                   'site_scons/site_tools/unittest.pyc'
+                   ])
+
 Default('driver')
