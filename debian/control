@@ -1,0 +1,22 @@
+Source: yandex-mongo-cxx-driver
+Priority: extra
+Maintainer: Vladimir Nikulichev <saturnus@yandex-team.ru>
+Build-Depends: debhelper (>= 8.0.0), cdbs, scons, libc6-dev, python, libboost-regex-dev, libboost-thread-dev, libboost-system-dev
+Standards-Version: 3.9.2
+Section: libs
+Homepage: https://github.com/mongodb/mongo-cxx-driver
+Vcs-Git: https://github.com/v-nikulichev/mongo-cxx-driver -b yandex-legacy-1.0.6
+
+Package: yandex-mongo-cxx-driver-dev
+Section: libdevel
+Architecture: any
+Depends: yandex-mongo-cxx-driver (= ${binary:Version})
+Description: Development files for legacy Mongo CXX Driver
+ Development files for legacy Mongo CXX Driver
+
+Package: yandex-mongo-cxx-driver
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Mongo CXX Driver
+ Mongo CXX Driver

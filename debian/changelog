@@ -1,0 +1,5 @@
+yandex-mongo-cxx-driver (1.0.6-2) unstable; urgency=low
+
+  * Forked from https://github.com/mongodb/mongo-cxx-driver
+
+ -- Vladimir Nikulichev <saturnus@yandex-team.ru>  Thu, 12 Nov 2015 17:20:43 +0300
