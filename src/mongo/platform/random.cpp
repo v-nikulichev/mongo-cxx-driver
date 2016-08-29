@@ -14,10 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#define MONGO_LOG_DEFAULT_COMPONENT ::mongo::logger::LogComponent::kDefault
+
+#include "mongo/platform/basic.h"
 
 #include "mongo/platform/random.h"
 
-#include <stdio.h>
 #include <string.h>
 
 #ifndef _WIN32
@@ -26,17 +28,17 @@
 
 #define _CRT_RAND_S
 #include <cstdlib>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
-#include "mongo/platform/basic.h"
+#include <mongo/util/log.h>
 
 namespace mongo {
 
 // ---- PseudoRandom  -----
 
-int32_t PseudoRandom::nextInt32() {
-    int32_t t = _x ^ (_x << 11);
+uint32_t PseudoRandom::nextUInt32() {
+    uint32_t t = _x ^ (_x << 11);
     _x = _y;
     _y = _z;
     _z = _w;
@@ -44,40 +46,37 @@ int32_t PseudoRandom::nextInt32() {
 }
 
 namespace {
-const int32_t default_y = 362436069;
-const int32_t default_z = 521288629;
-const int32_t default_w = 88675123;
-}
+const uint32_t default_y = 362436069;
+const uint32_t default_z = 521288629;
+const uint32_t default_w = 88675123;
+}  // namespace
 
-PseudoRandom::PseudoRandom(int32_t seed) {
+void PseudoRandom::_init(uint32_t seed) {
     _x = seed;
     _y = default_y;
     _z = default_z;
     _w = default_w;
 }
 
-
 PseudoRandom::PseudoRandom(uint32_t seed) {
-    _x = static_cast<int32_t>(seed);
-    _y = default_y;
-    _z = default_z;
-    _w = default_w;
+    _init(seed);
 }
 
+PseudoRandom::PseudoRandom(int32_t seed) {
+    _init(static_cast<uint32_t>(seed));
+}
 
 PseudoRandom::PseudoRandom(int64_t seed) {
-    int32_t high = seed >> 32;
-    int32_t low = seed & 0xFFFFFFFF;
+    _init(static_cast<uint32_t>(seed >> 32) ^ static_cast<uint32_t>(seed));
+}
 
-    _x = high ^ low;
-    _y = default_y;
-    _z = default_z;
-    _w = default_w;
+int32_t PseudoRandom::nextInt32() {
+    return nextUInt32();
 }
 
 int64_t PseudoRandom::nextInt64() {
-    int64_t a = nextInt32();
-    int64_t b = nextInt32();
+    uint64_t a = nextUInt32();
+    uint64_t b = nextUInt32();
     return (a << 32) | b;
 }
 
@@ -104,15 +103,16 @@ SecureRandom* SecureRandom::create() {
     return new WinSecureRandom();
 }
 
-#elif defined(__linux__) || defined(__sunos__) || defined(__APPLE__) || defined(__freebsd__)
+#elif defined(__linux__) || defined(__sunos__) || defined(__APPLE__) || defined(__FreeBSD__) || \
+    defined(__FreeBSD_kernel__) || defined(__gnu_hurd__)
 
 class InputStreamSecureRandom : public SecureRandom {
 public:
     InputStreamSecureRandom(const char* fn) {
         _in = new std::ifstream(fn, std::ios::binary | std::ios::in);
         if (!_in->is_open()) {
-            std::cerr << "can't open " << fn << " " << strerror(errno) << std::endl;
-            abort();
+            error() << "cannot open " << fn << " " << strerror(errno);
+            fassertFailed(28839);
         }
     }
 
@@ -124,7 +124,8 @@ public:
         int64_t r;
         _in->read(reinterpret_cast<char*>(&r), sizeof(r));
         if (_in->fail()) {
-            abort();
+            error() << "InputStreamSecureRandom failed to generate random bytes";
+            fassertFailed(28840);
         }
         return r;
     }
@@ -157,4 +158,4 @@ SecureRandom* SecureRandom::create() {
 #error Must implement SecureRandom for platform
 
 #endif
-}
+}  // namespace mongo
