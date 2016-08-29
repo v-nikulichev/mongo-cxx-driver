@@ -861,6 +861,8 @@ elif windows:
 
     env.Append(LIBS=[ 'ws2_32.lib', 'DbgHelp.lib' ])
 
+env.Append( CXXFLAGS=["-std=c++11"] )
+
 if nix:
 
     # -Winvalid-pch Warn if a precompiled header (see Precompiled Headers) is found in the search path but can't be used.

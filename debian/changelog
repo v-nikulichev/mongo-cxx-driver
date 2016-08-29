@@ -1,3 +1,10 @@
+yandex-mongo-cxx-driver (1.1.2-1) unstable; urgency=low
+
+  * Merged origin legacy branch
+  * Added option -std=c++11
+
+ -- Vladimir Nikulichev <saturnus@yandex-team.ru>  Mon, 29 Aug 2016 15:18:28 +0300
+
 yandex-mongo-cxx-driver (1.0.6-2) unstable; urgency=low
 
   * Forked from https://github.com/mongodb/mongo-cxx-driver
